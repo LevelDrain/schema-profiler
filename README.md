@@ -1,7 +1,7 @@
 ## 認知機能計測ツール（自分用）
 <br>
 
-注意！このPythonコードは全て、Anthropicの**生成AI「Claude」が作成したものです**。
+注意！このPythonコードは全て、Anthropicの**生成AI「Claude」が作成したもの**です。<br>
 <br>
 
 ## 用途
