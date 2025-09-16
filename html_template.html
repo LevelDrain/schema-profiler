@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Profiler - 認知スキーマ測定</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #fff, #64b5f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .task-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-canvas {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 8px;
+            margin: 15px 0;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #42a5f5, #1e88e5);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 165, 245, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #66bb6a, #43a047);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .choice-btn {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #64b5f6;
+            transform: scale(1.05);
+        }
+
+        .task-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #42a5f5, #66bb6a);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .result-display {
+            text-align: center;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-correct {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+        }
+
+        .result-incorrect {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #64b5f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #task-sequence {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        #stroop-word {
+            font-size: 48px;
+            text-align: center;
+            font-weight: bold;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Schema Profiler</h1>
+        <p class="subtitle">あなたの認知スキーマを科学的に測定します</p>
+
+        <div id="welcome-screen">
+            <div class="task-container">
+                <h3>測定開始</h3>
+                <p>複数の認知タスクを通じて、あなたの思考パターンと情報処理スタイルを分析します。</p>
+                <p><strong>所要時間:</strong> 約5-10分</p>
+                <p><strong>タスク内容:</strong></p>
+                <ul>
+                    <li>視覚探索 - 注意力と探索効率の測定</li>
+                    <li>パターン認識 - 論理的思考と規則発見能力</li>
+                    <li>ストループテスト - 認知的抑制と処理速度</li>
+                </ul>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startBattery()">測定開始</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="task-screen" class="hidden">
+            <div class="task-info">
+                <span id="current-task">タスク読み込み中...</span>
+                <span id="trial-counter">0/0</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+
+            <div class="task-container">
+                <div id="task-instruction">準備中...</div>
+
+                <!-- 視覚探索用キャンバス -->
+                <canvas id="visual-search-canvas" class="task-canvas hidden" width="800" height="400"></canvas>
+
+                <!-- パターン認識用 -->
+                <div id="pattern-task" class="hidden">
+                    <div id="task-sequence"></div>
+                    <div class="choices" id="pattern-choices"></div>
+                </div>
+
+                <!-- ストループテスト用 -->
+                <div id="stroop-task" class="hidden">
+                    <div id="stroop-word"></div>
+                    <div class="choices" id="stroop-choices"></div>
+                </div>
+
+                <div class="result-display" id="result-display">
+                    <div id="result-text"></div>
+                    <div id="result-rt"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-secondary" id="next-btn" onclick="nextTrial()" style="display:none;">次へ</button>
+                <button class="btn btn-success" id="finish-btn" onclick="showProfile()"
+                    style="display:none;">結果を見る</button>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="hidden">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>プロファイルを生成中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTask = null;
+        let startTime = null;
+        let taskQueue = [];
+        let currentTrialIndex = 0;
+        let totalTrials = 0;
+        let results = [];
+
+        // タスクキューを生成
+        function generateTaskQueue() {
+            const tasks = [
+                { type: 'visual_search', difficulty: 1, name: '視覚探索 (易)' },
+                { type: 'visual_search', difficulty: 2, name: '視覚探索 (中)' },
+                { type: 'pattern_recognition', difficulty: 1, name: 'パターン認識 (易)' },
+                { type: 'pattern_recognition', difficulty: 2, name: 'パターン認識 (中)' },
+                { type: 'stroop_test', difficulty: 1, name: 'ストループテスト (易)' },
+                { type: 'stroop_test', difficulty: 2, name: 'ストループテスト (中)' }
+            ];
+        }
+    </script>
