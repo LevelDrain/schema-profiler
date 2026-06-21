@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>構造写像実験パック v0.1</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">STRUCTURE MAPPING EXPERIMENT PACK</p>
+      <h1>構造写像実験パック <span>v0.1</span></h1>
+      <p class="lead">関係の対応付け、表面と構造の選択、構造の再構成を比較する探索用プロトタイプです。</p>
+    </header>
+
+    <section id="start-screen" class="panel">
+      <h2>実験を開始</h2>
+      <p>全6試行、所要時間は約5〜10分です。回答過程と操作ログをローカルに保存します。</p>
+      <label>
+        参加者ID
+        <input id="participant-id" value="self" maxlength="80" autocomplete="off">
+      </label>
+      <button id="start-button" class="primary">開始する</button>
+      <p id="start-error" class="error" aria-live="polite"></p>
+    </section>
+
+    <section id="experiment-screen" class="hidden">
+      <div class="status-row">
+        <span id="task-label"></span>
+        <span id="progress-label"></span>
+      </div>
+      <div class="progress"><div id="progress-bar"></div></div>
+      <section class="panel">
+        <h2 id="trial-title"></h2>
+        <p id="trial-instruction" class="instruction"></p>
+        <div id="task-root"></div>
+        <div class="confidence">
+          <label for="confidence">確信度: <strong id="confidence-value">3</strong> / 5</label>
+          <input id="confidence" type="range" min="1" max="5" value="3">
+        </div>
+        <div class="actions">
+          <button id="submit-button" class="primary" disabled>回答を確定</button>
+        </div>
+        <p id="trial-error" class="error" aria-live="polite"></p>
+      </section>
+    </section>
+
+    <section id="result-screen" class="hidden">
+      <section class="panel">
+        <p class="eyebrow">SESSION COMPLETE</p>
+        <h2>今回の観察結果</h2>
+        <p>これは診断ではなく、今回の6試行の記述的な要約です。</p>
+        <div id="summary-cards" class="summary-grid"></div>
+        <div id="trial-summary"></div>
+        <div class="actions">
+          <button id="download-button" class="primary">JSONログを保存</button>
+          <button id="restart-button">もう一度試す</button>
+        </div>
+        <p class="data-note">詳細ログは <code>data/structure_mapping.sqlite3</code> に保存されています。</p>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
